@@ -8,17 +8,27 @@ if "GOOGLE_API_KEY" not in os.environ:
     os.environ["GOOGLE_API_KEY"] = getpass.getpass("Enter your Google AI API key: ")
 
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.prompts import ChatPromptTemplate
 
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
 
-question = [
+prompt = ChatPromptTemplate.from_messages([
     (
         "system",
-        "You are a helpful assistant that translates English to Urdu. Translate the user sentence.",
+        "{system_message}",
     ),
-    ("human", "I love programming."),
-]
+    ("human", "{human_message}"),
+])
 
-print(f"Human: {question}")
-response = llm.invoke(question)
+chain = prompt | llm
+
+question = input("Enter the question: ")
+
+response = chain.invoke(
+    {
+        "system_message": "You are a helpful assistant",
+        "human_message": question,
+    }
+)
+
 print(f"AI: {response.content}")

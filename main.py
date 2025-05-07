@@ -9,26 +9,31 @@ if "GOOGLE_API_KEY" not in os.environ:
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import ChatPromptTemplate
+import streamlit as st
+from langchain_core.output_parsers import StrOutputParser
+
 
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
 
 prompt = ChatPromptTemplate.from_messages([
     (
         "system",
-        "{system_message}",
+        "You are a helpful assistant",
     ),
     ("human", "{human_message}"),
 ])
 
-chain = prompt | llm
+output_parser=StrOutputParser()
+chain = prompt | llm | output_parser
 
-question = input("Enter the question: ")
+st.title("Chatbot using LangChain")
+question = st.text_input("Enter your question:")
 
-response = chain.invoke(
+if question:
+    response = chain.invoke(
     {
-        "system_message": "You are a helpful assistant",
         "human_message": question,
-    }
-)
+    })
+    st.write(response)
 
-print(f"AI: {response.content}")
+    print("Response:", response)

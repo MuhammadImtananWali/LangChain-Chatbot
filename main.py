@@ -10,7 +10,15 @@ if "GOOGLE_API_KEY" not in os.environ:
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
-question = "Hello, Whats the date today?"
+
+question = [
+    (
+        "system",
+        "You are a helpful assistant that translates English to Urdu. Translate the user sentence.",
+    ),
+    ("human", "I love programming."),
+]
+
 print(f"Human: {question}")
 response = llm.invoke(question)
 print(f"AI: {response.content}")

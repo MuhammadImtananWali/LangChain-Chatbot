@@ -9,19 +9,21 @@ if [ ! -d "venv" ]; then
     source venv/bin/activate
 fi
 
-# Run Python backend in background
+# Start Python backend in background
 cd backend
 echo "Starting Python backend..."
 sh run.sh &
+PY_BACKEND_PID=$!
 cd ..
-wait
 
-# Run frontend in background
+# Wait for backend to become available
+echo "Waiting for Python backend to become ready..."
+until curl -s http://localhost:8000/health > /dev/null; do
+    sleep 1
+done
+echo "Python backend is ready."
+
+# Start frontend in background
 cd frontend
 echo "Starting frontend..."
-sh run.sh &
-cd ..
-
-# Start .NET backend (this one runs in the foreground)
-echo "Starting .NET backend..."
-dotnet run
+sh run.sh

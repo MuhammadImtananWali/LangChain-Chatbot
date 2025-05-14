@@ -1,12 +1,22 @@
 # Chatbot using LangChain
-This repo contains basic demo chatbot using langChain.
 
-### Prerequisite to start the app:
-`python3 -m venv venv`
+This repository hosts a chatbot built with LangChain.
 
-`source venv/bin/activate`
+## Prerequisites
 
-`pip install -r requirements.txt`
+1. Create a virtual environment:
+    ```bash
+    python3 -m venv venv
+    ```
 
-### Command to start the app:
-`python main.py`
+2. Activate the virtual environment:
+    ```bash
+    source venv/bin/activate
+    ```
+
+## Starting the Application
+
+Run the following command to start both the frontend and backend:
+```bash
+sh run.sh
+```

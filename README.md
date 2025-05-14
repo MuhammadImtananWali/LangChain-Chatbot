@@ -20,3 +20,10 @@ Run the following command to start both the frontend and backend:
 ```bash
 sh run.sh
 ```
+
+## Environment Variables
+
+1. `GOOGLE_API_KEY`: Replace with your Google API key.
+2. `LANGSMITH_TRACING`: Set to `true` or `false` to enable or disable tracing.
+3. `LANGSMITH_API_KEY`: Replace with your Langsmith API key.
+4. `LANGSMITH_PROJECT`: Replace with your Langsmith project name.

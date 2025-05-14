@@ -1,25 +1,27 @@
 #!/bin/bash
 
+# Exit on error
+set -e
+
 # Check and create virtual environment if it doesn't exist
 if [ ! -d "venv" ]; then
     python3 -m venv venv
     source venv/bin/activate
 fi
 
+# Run Python backend in background
+cd backend
+echo "Starting Python backend..."
+sh run.sh &
+cd ..
+wait
 
-# Install shared requirements once (if any)
-# pip install -r requirements.txt   # Uncomment if needed
+# Run frontend in background
+cd frontend
+echo "Starting frontend..."
+sh run.sh &
+cd ..
 
-# Run frontend and backend in parallel
-(cd frontend && sh run.sh) &
-frontend_pid=$!
-
-(cd backend && sh run.sh) &
-backend_pid=$!
-
-# Wait for frontend and backend
-wait $frontend_pid
-wait $backend_pid
-
-# Start .NET backend after Python services
+# Start .NET backend (this one runs in the foreground)
+echo "Starting .NET backend..."
 dotnet run

@@ -9,6 +9,8 @@ router = APIRouter()
 
 workflow = StateGraph(state_schema=MessagesState)
 
+messages = []
+
 
 class Prompt(BaseModel):
     message: str
@@ -43,8 +45,22 @@ app = initialize_app()
 
 @router.post("/chat", status_code=status.HTTP_200_OK)
 async def chat(prompt: Prompt):
+    global messages
+
     input_messages = [HumanMessage(prompt.message)]
     response = app.invoke(
         {"messages": input_messages}, {"configurable": {"thread_id": "abc123"}}
     )
+    messages = response["messages"]
     return {"response": response["messages"][-1]}
+
+
+@router.get("/chats")
+async def get_all_messages():
+    """
+    Get all messages from the memory.
+    """
+    simplified_messages = [
+        {"role": message.type, "content": message.content} for message in messages
+    ]
+    return {"chats": simplified_messages}

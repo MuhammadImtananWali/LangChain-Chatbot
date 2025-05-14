@@ -1,0 +1,5 @@
+fastapi[standard]
+dotenv
+pydantic
+langchain-google-genai
+langchain

@@ -18,7 +18,7 @@ def send_message():
                 "http://localhost:8000/chat", json={"message": user_input}
             )
             if response.status_code == 200:
-                bot_response = response.json()["response"]
+                bot_response = response.json()["response"]["content"]
                 st.session_state.chat_history.append(
                     {"role": "assistant", "content": bot_response}
                 )

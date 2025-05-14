@@ -3,3 +3,4 @@ dotenv
 pydantic
 langchain-google-genai
 langchain
+langgraph

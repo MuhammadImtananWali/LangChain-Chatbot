@@ -1,32 +1,50 @@
-from typing import List
 from pydantic import BaseModel
-from langchain_google_genai import ChatGoogleGenerativeAI
 from fastapi import APIRouter, status
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain
+from langchain_core.messages import HumanMessage
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.graph import START, MessagesState, StateGraph
 
 router = APIRouter()
+
+workflow = StateGraph(state_schema=MessagesState)
 
 
 class Prompt(BaseModel):
     message: str
 
 
-def get_llm():
+def initialize_app():
     model_name = "gemini-2.0-flash"
     llm = ChatGoogleGenerativeAI(
         model=model_name,
         temperature=0.3,
     )
-    memory = ConversationBufferMemory()
 
-    # Create a conversation chain with memory
-    conversation = ConversationChain(llm=llm, memory=memory)
-    return conversation
+    # ----------Set up memory start ----------
+
+    def call_model(state: MessagesState):
+        response = llm.invoke(state["messages"])
+        return {"messages": response}
+
+    workflow.add_edge(START, "model")
+    workflow.add_node("model", call_model)
+
+    memory = MemorySaver()
+    app = workflow.compile(checkpointer=memory)
+
+    # ----------Set up memory end ----------
+
+    return app
+
+
+app = initialize_app()
 
 
 @router.post("/chat", status_code=status.HTTP_200_OK)
 async def chat(prompt: Prompt):
-    llm = get_llm()
-    response = llm.predict(input=prompt.message)
-    return {"response": response}
+    input_messages = [HumanMessage(prompt.message)]
+    response = app.invoke(
+        {"messages": input_messages}, {"configurable": {"thread_id": "abc123"}}
+    )
+    return {"response": response["messages"][-1]}
